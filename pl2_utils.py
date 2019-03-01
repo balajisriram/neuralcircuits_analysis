@@ -8,8 +8,8 @@ import numpy as np
 
 ppr = pprint.PrettyPrinter(indent=2).pprint
 
-def prep_for_session(base,subj,date):
-    output_loc = os.path.join(base,'output',subj+'_'+date)
+def create_session_dir_if_needed(base,subj,date,output_name='output'):
+    output_loc = os.path.join(base,output_name,subj+'_'+date)
     if not os.path.exists(output_loc):        
         os.makedirs(output_loc)
     return output_loc
@@ -71,7 +71,7 @@ def load_and_pack_WB(base_loc,sess,output_loc=None,n_recorded=32,dref = None,):
     signal_names,details = verify_names(pl2_file_path, type='WB',contains=rig, n_req=n_recorded)
     
     if not output_loc:
-        output_loc = prep_for_session(base_loc,subj,date)
+        output_loc = create_session_dir_if_needed(base_loc,subj,date)
         
     n_samples,n_channels = details
     data_array = np.zeros([n_samples, n_channels], np.int16)
@@ -79,8 +79,8 @@ def load_and_pack_WB(base_loc,sess,output_loc=None,n_recorded=32,dref = None,):
     for i,signal_name in enumerate(signal_names):
         print('%d.' %i ,end='')
         sys.stdout.flush()
-        temp1 = pl2_ad(pl2_file_path, signal_name)
-        temp = np.asarray(temp1.ad)
+        temp_f,n,temp_ts,temp_frag_counts,temp = pl2_ad(pl2_file_path, signal_name)
+        temp = np.asarray(temp)
         if np.max(np.abs(temp))>max_value:
             max_value = np.max(np.abs(temp))
     print("")
@@ -90,12 +90,12 @@ def load_and_pack_WB(base_loc,sess,output_loc=None,n_recorded=32,dref = None,):
     for i,signal_name in enumerate(signal_names):
         print('%d.' %i ,end='')
         sys.stdout.flush()
-        temp1 = pl2_ad(pl2_file_path, signal_name)
-        temp = np.asarray(temp1.ad)
+        temp_f,n,temp_ts,temp_frag_counts,temp = pl2_ad(pl2_file_path, signal_name)
+        temp = np.asarray(temp)
         temp = np.int16(temp/max_value*32767)
         data_array[:,i] = temp
     print("")
-    wb_timestamp = temp1.timestamps
+    wb_timestamp = temp_ts
     wb_timestamp = np.asarray(wb_timestamp)
     voltage_scale=max_value/32767
     
@@ -118,6 +118,8 @@ def load_and_pack_WB(base_loc,sess,output_loc=None,n_recorded=32,dref = None,):
     data_array.tofile(os.path.join(output_loc,dat_filename))
     voltage_scale.tofile(os.path.join(output_loc,'voltage_scale.np'))
     wb_timestamp.tofile(os.path.join(output_loc,'wb_timestamp.np'))
+    
+    return output_loc
 
 def load_and_pack_running(base_loc,sess,output_loc=None):
     (subj,date,session,rig,running_channel,heastage,electrode) = sess
@@ -129,7 +131,7 @@ def load_and_pack_running(base_loc,sess,output_loc=None):
     signal_names,details = verify_names(pl2_file_path, type='Running',contains=running_chan_details, n_req=1)
     
     if not output_loc:
-        output_loc = prep_for_session(base_loc,subj,date)
+        output_loc = create_session_dir_if_needed(base_loc,subj,date)
         
     running_f, n, running_ts, frag_count, running = pl2_ad(pl2_file_path, signal_names[0]) # only one
     running_f = np.asarray(running_f)
@@ -147,7 +149,7 @@ def load_and_pack_events(base_loc,sess,output_loc=None):
     signal_names,details = verify_names(pl2_file_path, type='Events',contains=rig)
     
     if not output_loc:
-        output_loc = prep_for_session(base_loc,subj,date)
+        output_loc = create_session_dir_if_needed(base_loc,subj,date)
         
     event_data = {}
     for signal_name in signal_names:

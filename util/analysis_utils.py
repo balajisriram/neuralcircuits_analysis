@@ -46,7 +46,7 @@ def make_prb_file(headstage,electrode,save_path,mapping_loc=r'C:\Users\bsriram\D
             for edge in graph:
                 f.write("                (s[{0}],s[{1}]),".format(edge[0],edge[1]))
                 f.write("\n")
-            f.write("                ]\n")
+            f.write("                ],\n")
             
             ## make the "geometry" section
             f.write("        'geometry':{\n")
@@ -54,7 +54,7 @@ def make_prb_file(headstage,electrode,save_path,mapping_loc=r'C:\Users\bsriram\D
                 f.write("                s[{0}]:({1},{2}),\n".format(ch,geom[ch][0],geom[ch][1]))
             f.write("                }\n")
             
-            f.write("      }\n")
+            f.write("      },\n")
         f.write("}\n")
     return probe_name
     
@@ -79,51 +79,98 @@ def make_prm_file(session_location, sample_rate=40000., experiment_name=None, pr
     num_samp_before = math.ceil(sample_rate/1000)
     num_samp_after = num_samp_before
     with open(os.path.join(session_location, 'params.prm'),'w') as f:
-        f.write("""
-experiment_name = '{0}'
-prb_file = '{1}'
+        f.write("experiment_name = '{0}'\n".format(experiment_name))
+        f.write("prb_file = '{0}'\n".format(probe_file))
+        f.write("traces = dict(\n")
+        f.write("    raw_data_files=[experiment_name + '.dat'],\n")
+        f.write("    voltage_gain={0},\n".format(voltage_gain[0]))
+        f.write("    sample_rate={0},\n".format(sample_rate))
+        f.write("    n_channels=32,\n")
+        f.write("    dtype='int16',\n")
+        f.write(")\n")
+        f.write("spikedetekt = dict(\n")
+        f.write("    filter_low=500.,  # Low pass frequency (Hz)\n")
+        f.write("    filter_high_factor=0.95 * .5,\n")
+        f.write("    filter_butter_order=3,  # Order of Butterworth filter.\n")
+        f.write("    filter_lfp_low=0,  # LFP filter low-pass frequency\n")
+        f.write("    filter_lfp_high=300,  # LFP filter high-pass frequency\n")
+        f.write("    chunk_size_seconds=1,\n")
+        f.write("    chunk_overlap_seconds=.015,\n")
+        f.write("    n_excerpts=50,\n")
+        f.write("    excerpt_size_seconds=1,\n")
+        f.write("    threshold_strong_std_factor=4.5,\n")
+        f.write("    threshold_weak_std_factor=2.,\n")
+        f.write("    detect_spikes='both',\n")
+        f.write("    connected_component_join_size=1,\n")
+        f.write("    extract_s_before={0},\n".format(int(num_samp_before)))
+        f.write("    extract_s_after={0},\n".format(int(num_samp_after)))
+        f.write("    n_features_per_channel=3,  # Number of features per channel.\n")
+        f.write("    pca_n_waveforms_max=10000,\n")
+        f.write(")\n")
+        f.write("klustakwik2 = dict(\n")
+        f.write("    num_starting_clusters=100,\n")
+        f.write("    max_iterations=1000,\n")
+        f.write("    max_possible_clusters=100,\n")
+        f.write(")\n")
 
-traces = dict(
-    raw_data_files=[experiment_name + '.dat'],
-    voltage_gain={3},
-    sample_rate={2},
-    n_channels=32,
-    dtype='int16',
-)
+def make_qsub_file(session_location, base_on_server='/home/bsriram/data_biogen/',):
 
-spikedetekt = dict(
-    filter_low=500.,  # Low pass frequency (Hz)
-    filter_high_factor=0.95 * .5,
-    filter_butter_order=3,  # Order of Butterworth filter.
+    local_base,session_folder_name = os.path.split(session_location)
+    server_wd = base_on_server+session_folder_name
 
-    filter_lfp_low=0,  # LFP filter low-pass frequency
-    filter_lfp_high=300,  # LFP filter high-pass frequency
+    with open(os.path.join(session_location, 'submit.qsub'),mode='w') as f:
+        f.write("#!/bin/bash\n")
+        f.write("#$ -N {0}\n".format(session_folder_name+'_kwik'))
+        f.write("#$ -l h_rt=24:00:00\n")
+        f.write("#$ -q long.q\n")
+        f.write("#$ -wd {0}\n".format(server_wd))
+        f.write("#$ -j no\n")
+        f.write("#$ -M balaji.sriram@biogen.com\n")
+        f.write("#$ -m be\n")
+        f.write("#$ -e error.log\n")
+        f.write("#$ -o output.log\n")
+        f.write("#$ -pe openmpi-fillup 12\n")
+        f.write("##########################################################################\n")
+        f.write("# Start your script here #\n")
+        f.write("##########################################################################\n")
+        f.write("# Load the modules you need.\n")
+        f.write("export LC_ALL=en_US.utf8\n")
+        f.write("export LANG=en_US.utf8\n")
+        f.write("source /home/bsriram/miniconda3/bin/activate klusta\n")
+        f.write("# Run some commands.\n")
+        f.write("klusta --overwrite --detect-only params.prm\n")
+        f.write("rm -rf .spikedetekt\n")
+        f.write("klusta --cluster-only params.prm\n")
+        f.write("# Exit successfully.\n")
+        f.write("exit 0\n")
 
-    chunk_size_seconds=1,
-    chunk_overlap_seconds=.015,
+def make_qsub_file_1(session_location, base_on_server='/home/bsriram/data_biogen/',):
 
-    n_excerpts=50,
-    excerpt_size_seconds=1,
-    threshold_strong_std_factor=4.5,
-    threshold_weak_std_factor=2.,
-    detect_spikes='both',
-
-    connected_component_join_size=1,
-
-    extract_s_before={4},
-    extract_s_after={5},
-
-    n_features_per_channel=3,  # Number of features per channel.
-    pca_n_waveforms_max=10000,
-)
-
-klustakwik2 = dict(
-    num_starting_clusters=100,
-    max_iterations=1000,
-    max_possible_clusters: 100,
-)
-        """.format(experiment_name,probe_file,sample_rate,voltage_gain,num_samp_before,num_samp_after))
-
-def load_and_pack_dat(loc, rig='R1', n=32, outof=64):
-    pass
-        
+    local_base,session_folder_name = os.path.split(session_location)
+    server_wd = base_on_server+session_folder_name
+    with open(os.path.join(session_location, 'submit.qsub'),mode='w',newline='\n') as f:
+        f.write(file_string)
+    file_string = """#!/bin/bash
+#$ -N {0}
+#$ -l h_rt=24:00:00
+#$ -q long.q
+#$ -wd {1}
+#$ -j no
+#$ -M balaji.sriram@biogen.com
+#$ -m be
+#$ -e error.log
+#$ -o output.log
+#$ -pe openmpi-fillup 12
+##########################################################################
+# Start your script here #
+##########################################################################
+# Load the modules you need.
+export LC_ALL=en_US.utf8
+export LANG=en_US.utf8
+source /home/bsriram/miniconda3/bin/activate klusta
+# Run some commands.
+klusta params.prm
+# Exit successfully.
+exit 0""".format(session_folder_name,server_wd)
+    
+  

@@ -2,11 +2,22 @@ name: neur_circ_analysis
 channels:
   - defaults
 dependencies:
+  - blas=1.0=mkl
   - certifi=2018.11.29=py27_0
   - git=2.20.1=h6bb4b03_0
+  - icc_rt=2019.0.0=h0cc432a_1
+  - intel-openmp=2019.1=144
+  - mkl=2019.1=144
+  - mkl_fft=1.0.10=py27h44c1dab_0
+  - numpy=1.15.4=py27h5fc8d92_0
+  - numpy-base=1.15.4=py27hb1d0314_0
+  - pandas=0.24.1=py27hc56fc5f_0
   - pip=19.0.1=py27_0
   - python=2.7.15=hcb6e200_5
+  - python-dateutil=2.7.5=py27_0
+  - pytz=2018.9=py27_0
   - setuptools=40.7.3=py27_0
+  - six=1.12.0=py27_0
   - sqlite=3.26.0=h0c8e037_0
   - vc=9=h7299396_1
   - vs2008_runtime=9.00.30729.1=hfaea7d5_1
@@ -45,7 +56,6 @@ dependencies:
     - nbconvert==5.4.0
     - nbformat==4.4.0
     - notebook==5.7.4
-    - numpy==1.16.1
     - pandocfilters==1.4.2
     - pathlib2==2.3.3
     - pickleshare==0.7.5
@@ -53,8 +63,6 @@ dependencies:
     - prompt-toolkit==1.0.15
     - pygments==2.3.1
     - pyparsing==2.3.1
-    - python-dateutil==2.8.0
-    - pytz==2018.9
     - pywinpty==0.5.5
     - pyzmq==17.1.2
     - qtconsole==4.4.3
@@ -63,7 +71,6 @@ dependencies:
     - send2trash==1.5.0
     - simplegeneric==0.8.1
     - singledispatch==3.4.0.3
-    - six==1.12.0
     - terminado==0.8.1
     - testpath==0.4.2
     - tornado==5.1.1
