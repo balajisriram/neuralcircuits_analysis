@@ -1,5 +1,8 @@
 from electrode_utils import get_headstage_map,get_electrode_map,get_graph_from_geometry
 import os
+import numpy as np
+
+np64 = np.float64
 
 def make_prb_file(headstage,electrode,save_path,mapping_loc=r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\mappings',probe_name=None):
     if not probe_name:
@@ -100,7 +103,7 @@ def make_prm_file(session_location, sample_rate=40000., experiment_name=None, pr
         f.write("    excerpt_size_seconds=1,\n")
         f.write("    threshold_strong_std_factor=4.5,\n")
         f.write("    threshold_weak_std_factor=2.,\n")
-        f.write("    detect_spikes='both',\n")
+        f.write("    detect_spikes='negative',\n")
         f.write("    connected_component_join_size=1,\n")
         f.write("    extract_s_before={0},\n".format(int(num_samp_before)))
         f.write("    extract_s_after={0},\n".format(int(num_samp_after)))
@@ -173,4 +176,127 @@ klusta params.prm
 # Exit successfully.
 exit 0""".format(session_folder_name,server_wd)
     
-  
+def load_spike_and_trial_details(loc):
+    spike_and_trial_details = {}
+    print('Loading trial details')
+    spike_and_trial_details['trial_records'] = load_trialrecs_to_dict(loc)
+    print('Loading spike details')
+    spike_and_trial_details['spike_records'] = load_spikerecs_to_dict(loc)
+    return spike_and_trial_details
+    
+    
+def load_trialrecs_to_dict(loc):
+    file = [f for f in os.listdir(loc) if f.startswith('trialRecords')]
+    if len(file) > 1 or len(file)==0:
+        print(loc)
+        error('too many or too few trial Records. how is this possible?')
+    
+    temp = scipy.io.loadmat(os.path.join(loc,file[0]))
+    pdb.set_trace()
+    tRs = temp['trialRecords'][0]
+    numTrials = tRs.size
+    
+    trial_number = []
+    refresh_rate = []
+    step_name = []
+    stim_manager_name = []
+    trial_manager_name = []
+    afc_grating_type = []
+    trial_start_index = []
+    trial_end_index = []
+    
+    pix_per_cycs = []
+    driftfrequency = []
+    orientation = []
+    phase = []
+    contrast = []
+    max_duration = []
+    radius = []
+    annulus = []
+    waveform = []
+    radius_type = []
+    location = []
+    
+    led_on = []
+    led_intensity = []
+    
+    events = find_indices_for_all_trials(loc)
+    events = get_channel_events(loc,events)
+    for i,tR in enumerate(tRs):
+        this_trial_number = np64(tR['trialNumber'][0][0])
+        if this_trial_number in events['trial_number']:
+            which_in_messages = [True if x==this_trial_number else False for x in events['trial_number']]
+            this_start_index = [x for i,x in enumerate(events['start_index']) if which_in_messages[i]==True]
+            this_end_index = [x for i,x in enumerate(events['end_index']) if which_in_messages[i]==True]
+        else:
+            continue
+        
+        trial_number.append(np64(tR['trialNumber'][0][0]))
+        refresh_rate.append(np64(tR['refreshRate'][0][0]))
+        
+        step_name.append(tR['stepName'][0])
+        stim_manager_name.append(tR['stimManagerClass'][0])
+        trial_manager_name.append(tR['trialManagerClass'][0])
+        afc_grating_type.append(tR['afcGratingType'][0])
+        
+        trial_start_index.append(this_start_index[0])
+        trial_end_index.append(this_end_index[0])
+        
+        try: pix_per_cycs.append(np64(tR['stimulus'][0]['pixPerCyc'][0][0][0]))
+        except: pix_per_cycs.append(np64(tR['stimulus'][0]['pixPerCycs'][0][0][0]))
+        
+        try: driftfrequency.append(np64(tR['stimulus'][0]['driftfrequency'][0][0][0]))
+        except: driftfrequency.append(np64(tR['stimulus'][0]['driftfrequencies'][0][0][0]))
+        
+        try: orientation.append(np64(tR['stimulus'][0]['orientation'][0][0][0]))
+        except: orientation.append(np64(tR['stimulus'][0]['orientations'][0][0][0]))
+        
+        try: phase.append(np64(tR['stimulus'][0]['phase'][0][0][0]))
+        except: phase.append(np64(tR['stimulus'][0]['phases'][0][0][0]))
+        
+        try: contrast.append(np64(tR['stimulus'][0]['contrast'][0][0][0]))
+        except: contrast.append(np64(tR['stimulus'][0]['contrasts'][0][0][0]))
+        
+        max_duration.append(np64(tR['stimulus'][0]['maxDuration'][0][0][0]))
+        
+        try: radius.append(np64(tR['stimulus'][0]['radius'][0][0][0]))
+        except: radius.append(np64(tR['stimulus'][0]['radii'][0][0][0]))
+        
+        try: annulus.append(np64(tR['stimulus'][0]['annulus'][0][0][0]))
+        except: annulus.append(np64(tR['stimulus'][0]['annuli'][0][0][0]))
+        
+        waveform.append(tR['stimulus'][0]['waveform'][0][0])
+        radius_type.append(tR['stimulus'][0]['radiusType'][0][0])
+        
+        location.append(np64(tR['stimulus'][0]['location'][0][0]))
+        
+        led_on.append(np64(tR['LEDON'][0][0]))
+        led_intensity.append(np64(tR['LEDIntensity'][0][0]))
+        
+    trial_records = dict([('trial_number',trial_number),\
+                         ('refresh_rate',refresh_rate),\
+                         ('step_name',step_name),\
+                         ('stim_manager_name',stim_manager_name),\
+                         ('trial_manager_name',trial_manager_name),\
+                         ('afc_grating_type',afc_grating_type),\
+                         ('trial_start_index',trial_start_index),\
+                         ('trial_end_index',trial_end_index),\
+                         ('pix_per_cycs',pix_per_cycs),\
+                         ('driftfrequency',driftfrequency),\
+                         ('orientation',orientation),\
+                         ('phase',phase),\
+                         ('contrast',contrast),\
+                         ('max_duration',max_duration),\
+                         ('radius',radius),\
+                         ('annulus',annulus),\
+                         ('waveform',waveform),\
+                         ('radius_type',radius_type),\
+                         ('location',location),\
+                         ('led_on',led_on),\
+                         ('led_intensity',led_intensity),\
+                         ('events',events)])
+                         
+    return trial_records
+
+def read_trial_records():
+    pass
