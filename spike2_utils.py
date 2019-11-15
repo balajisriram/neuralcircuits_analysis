@@ -11,7 +11,7 @@ import matplotlib
 from scipy.optimize import curve_fit
 import matplotlib.colors as mc
 import colorsys
-
+import scipy.stats as stats
 
 ppr = pprint.PrettyPrinter(indent=2).pprint
 
@@ -324,7 +324,12 @@ def lighten_color(color, amount=0.5):
     """
     color = colorsys.rgb_to_hls(*mc.to_rgb(color))
     return colorsys.hls_to_rgb(color[0], 1 - amount * (1 - color[1]), color[2])
-    
+
+def get_r_squared(data,fits):
+    sse = np.sum(np.power(data-fits,2))
+    sst = np.sum(np.power(data-data.mean(),2))
+    return 1-sse/sst
+
 def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_zoom=2,interval=[-1,3]):
     # kwik_file
     kwik_file = [f for f in os.listdir(loc) if f.endswith('.kwik')]
@@ -377,48 +382,56 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
                 max_z_for_unit.append(max_z)
                 summed_z_for_unit.append(total_z)
                 time_base.append(0.1*k+0.05)
-            this_unit['max_z'] = np.asarray(max_z_for_unit)
-            this_unit['summed_z'] = np.asarray(summed_z_for_unit)
-            this_unit['stable_response'] = np.mean(this_unit['max_z'][-4:])/this_unit['max_z'][0]
-            this_unit['max_response'] = np.max(max_z_for_unit)
-            this_unit['first_pulse_ratio'] = this_unit['max_z'][1]/this_unit['max_z'][0]
-            this_unit['second_pulse_ratio'] = this_unit['max_z'][2]/this_unit['max_z'][0]
-            this_unit['channel_number'] = i
+            this_unit['mean_activity_ms'] = m_prestim
+            this_unit['std_activity_ms'] = sd_prestim
+            this_unit['max_z_ms'] = np.asarray(max_z_for_unit)
+            this_unit['summed_z_ms'] = np.asarray(summed_z_for_unit)
+            this_unit['stable_response_ms'] = np.mean(this_unit['max_z'][-4:])/this_unit['max_z'][0]
+            this_unit['max_response_ms'] = np.max(max_z_for_unit)
+            this_unit['first_pulse_ratio_ms'] = this_unit['max_z'][1]/this_unit['max_z'][0]
+            this_unit['second_pulse_ratio_ms'] = this_unit['max_z'][2]/this_unit['max_z'][0]
+            this_unit['channel_number_ms'] = i
             time_base = np.asarray(time_base)
             
             # look at off responses
             time_bin_off = np.bitwise_and(binned_time[:-1]>=2.0,binned_time[:-1]<=2.5)
             total_off_z = np.sum(z_score[time_bin_off])
-            this_unit['off_response'] = total_off_z
+            this_unit['off_response_ms'] = total_off_z
             
             # fit to exponential_func
             try:
-                max_z = this_unit['max_z']
+                max_z = this_unit['max_z_ms']
                 popt, pcov = curve_fit(exponential_func, time_base, max_z, p0=(max_z[0], 1e-6, 1),bounds=([max_z[0]*0.95,0,0],[max_z[0]*1.05,np.inf,np.inf]))
                 xx = np.linspace(0, 2, 1000)
                 yy = exponential_func(xx, *popt)
                 ax[1].plot(xx,yy+offset,color=unit_color,linewidth=2)
-                this_unit['max_z_t'] = 1/popt[1]
+                this_unit['max_z_t_ms'] = 1/popt[1]
                 ax[1].text(xx[-1],offset,'{0:.2f}'.format(1000/popt[1]),horizontalalignment='center',verticalalignment='bottom',fontsize=20)
+                this_unit['max_z_t_quality_ms'] = get_r_squared(max_z,exponential_func(time_base, *popt))
             except RuntimeError:
                 print('Runtime')
-                this_unit['max_z_t'] = np.nan
+                this_unit['max_z_t_ms'] = np.nan
+                this_unit['max_z_t_quality_ms'] = np.nan
             except ValueError: 
-                this_unit['max_z_t'] = np.nan
+                this_unit['max_z_t_ms'] = np.nan
+                this_unit['max_z_t_quality_ms'] = np.nan
             
             try:
-                summed_z = this_unit['summed_z']
+                summed_z = this_unit['summed_z_ms']
                 popt, pcov = curve_fit(exponential_func, time_base, summed_z, p0=(summed_z[0], 1e-6, 1),bounds=([summed_z[0]*0.95,0,0],[summed_z[0]*1.05,np.inf,np.inf]))
                 xx = np.linspace(0, 2, 1000)
                 yy = exponential_func(xx, *popt)
                 ax[2].plot(xx,yy+offset,color=unit_color,linewidth=2)
-                this_unit['total_z_t'] = 1/popt[1]
+                this_unit['total_z_t_ms'] = 1/popt[1]
                 ax[2].text(xx[-1],offset,'{0:.2f}'.format(1000/popt[1]),horizontalalignment='center',verticalalignment='bottom',fontsize=20)
+                this_unit['total_z_t_quality_ms'] = get_r_squared(max_z,exponential_func(time_base, *popt))
             except RuntimeError:
                 print('Runtime')
-                this_unit['total_z_t'] = np.nan
+                this_unit['total_z_t_ms'] = np.nan
+                this_unit['total_z_t_quality_ms'] = np.nan
             except ValueError: 
-                this_unit['total_z_t'] = np.nan
+                this_unit['total_z_t_ms'] = np.nan
+                this_unit['total_z_t_quality_ms'] = np.nan
             units.append(this_unit)
         else: ax[1].plot(binned_time[:-1],offset+z_zoom*z_score,color=(0.85,0.85,0.85))
         
@@ -437,7 +450,6 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
     if show_plot: plt.show()
     return fig,units
     
-
 def analyze_mua_by_channel_singlestim(loc,type='raster',show_plot=True,min_z=5,z_zoom=5,interval=[-1,1]):
     # kwik_file
     kwik_file = [f for f in os.listdir(loc) if f.endswith('.kwik')]
@@ -487,15 +499,17 @@ def analyze_mua_by_channel_singlestim(loc,type='raster',show_plot=True,min_z=5,z
                 max_z_for_unit.append(max_z)
                 summed_z_for_unit.append(total_z)
                 time_base.append(0.1*k+0.05)
-            this_unit['max_z'] = np.asarray(max_z_for_unit)
-            this_unit['summed_z'] = np.asarray(summed_z_for_unit)
+            this_unit['mean_activity_ss'] = np.asarray(max_z_for_unit)
+            this_unit['std_activity_ss'] = np.asarray(max_z_for_unit)
+            this_unit['max_z_ss'] = np.asarray(max_z_for_unit)
+            this_unit['summed_z_ss'] = np.asarray(summed_z_for_unit)
             this_unit['channel_number'] = i
             time_base = np.asarray(time_base)
             
             # look at off responses
             time_bin_off = np.bitwise_and(binned_time[:-1]>=0.1,binned_time[:-1]<=1.0)
             total_off_z = np.mean(z_score[time_bin_off])
-            this_unit['off_response'] = total_off_z
+            this_unit['off_response_ss'] = total_off_z
             print(total_off_z)
 
             units.append(this_unit)
@@ -520,8 +534,6 @@ def analyze_mua_by_channel_singlestim(loc,type='raster',show_plot=True,min_z=5,z
     if show_plot: plt.show()
     return fig,units
     
-    
-
 def plot_unit(unit,timestamps,interval,ax,type):
     all_ts = []
     for i,ts in enumerate(timestamps):
@@ -619,9 +631,80 @@ def write_params_file(base,fold):
         f.write(")\n")
     return 0
 
+def plot_feature_across_areas(allData,feature,split_by_subj=True,sig_thresh=0.0025,plot_on=True,label='',filter_hi=None,filter_lo=None):
+    if plot_on: fig,ax = plt.subplots(1,4,figsize=(20,5),sharey=True)
+    locations = ['V1','LGN','S1','VPLM']
+    Ts = []
+    Ps = []
+    Effects = []
+    Vals_hom = []
+    Vals_wt = []
+    for i,location in enumerate(locations):
+        hom = allData.loc[(allData['location']==location) & (allData['genotype']=='HOM'),feature]
+        hom_sub = allData.loc[(allData['location']==location) & (allData['genotype']=='HOM'),'subject']
+        if filter_hi:
+            which = hom<filter_hi
+            hom = hom[which]
+            hom_sub = hom_sub[which]
+        if filter_lo:
+            which = hom>filter_lo
+            hom = hom[which]
+            hom_sub = hom_sub[which]
+        wt = allData.loc[(allData['location']==location) & (allData['genotype']=='WT'),feature]
+        wt_sub = allData.loc[(allData['location']==location) & (allData['genotype']=='WT'),'subject']
+        if filter_hi:
+            which = wt<filter_hi
+            wt = wt[which]
+            wt_sub = wt_sub[which]
+        if filter_lo:
+            which = wt>filter_lo
+            wt = wt[which]
+            wt_sub = wt_sub[which]
+        hom_by_sub = []
+        wt_by_sub = []
+    
+        # plot wild_type
+        curr_color = (0.,0.,1.)
+        for j,sub in enumerate(np.unique(wt_sub)):
+            if plot_on: ax[i].scatter(0.9-0.25*(j+1)+0.1*np.random.rand(1,wt[wt_sub==sub].size),wt[wt_sub==sub],color=curr_color)
+            wt_by_sub.append(np.nanmean(wt[wt_sub==sub]))
+            curr_color=lighten_color(curr_color,amount=0.8)
+        # plot homs
+        curr_color = (1.,0.,0.)
+        for j,sub in enumerate(np.unique(hom_sub)):
+            if plot_on:ax[i].scatter(2.1+0.25*(j+1)+0.1*np.random.rand(1,hom[hom_sub==sub].size),hom[hom_sub==sub],color=curr_color)
+            hom_by_sub.append(np.nanmean(hom[hom_sub==sub]))
+            curr_color=lighten_color(curr_color,amount=0.8)
+        if plot_on: ax[i].boxplot([wt,hom],showmeans=True)
+        if plot_on: ax[i].set_title(location+' - '+feature)
+        if plot_on: ax[i].set_xlim([-2,5])
+        if plot_on: ax[i].set_xticks([0.75,2.25])
+        if plot_on: ax[i].set_xticklabels(['WT','KO'])
+        
+        (t,p) = stats.ttest_ind(hom_by_sub,wt_by_sub)
+        effect = np.mean(hom_by_sub)/np.mean(wt_by_sub)
+        
+        
+
+        Ts.append(t)
+        Ps.append(p)
+        Effects.append(effect)
+        Vals_hom.append(hom_by_sub)
+        Vals_wt.append(wt_by_sub)
+        
+    ax[0].set_ylabel(label,fontsize=15)
+    fig.suptitle(feature)
+    return Ts,Ps,Effects,Vals_hom,Vals_wt
+
+
 if __name__=='__main__':
-    loc = r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc1_VisStim_B'
-    plot_mua_by_channel(loc)
+    data = np.arange(1000)+1000000*(np.random.rand(1,1000)-0.5)
+    fits = np.arange(1000)
+    print(get_r_squared(data,fits))
+    plt.scatter(data,fits)
+    plt.show()
+    # loc = r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc1_VisStim_B'
+    # plot_mua_by_channel(loc)
     # Multi stim response
     # # All V1
     # timescale_i = []
