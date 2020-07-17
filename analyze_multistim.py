@@ -7,21 +7,21 @@ import pandas as pd
 allData = pd.DataFrame()
 
 # V1
-locs_V1_HOM = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_2_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_3_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_5_Loc1_VisStim_D',]
+locs_V1_HOM = [r'C:\Data\PGRN_Old\PGRN_HOM_1_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_2_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_3_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_5_Loc1_VisStim_D',]
 V1_HOM_subjects = ['HOM1','HOM2','HOM3','HOM4','HOM5']
 V1_HOM_location = ['Loc1','Loc1','Loc1','Loc1','Loc1']
-locs_V1_WT = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_10_Loc3_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_11_Loc3_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_15_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_16_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_17_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_17_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_18_Loc1_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_19_Loc1_VisStim_D',]
+locs_V1_WT = [r'C:\Data\PGRN_Old\PGRN_WT_10_Loc3_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_11_Loc3_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_15_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_16_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_17_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_17_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_18_Loc1_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_19_Loc1_VisStim_D',]
 V1_WT_subjects = ['WT10','WT11','WT15','WT16','WT17','WT17','WT18','WT19']
 V1_WT_location = ['Loc3','Loc3','Loc1','Loc1','Loc1','Loc2','Loc1','Loc1']
 with PdfPages('V1_multistim.pdf') as pdf:
@@ -55,24 +55,24 @@ with PdfPages('V1_multistim.pdf') as pdf:
         plt.close()
 
 # LGN
-locs_LGN_HOM = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_2_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_3_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_5_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_5_Loc3_VisStim_D',]
+locs_LGN_HOM = [r'C:\Data\PGRN_Old\PGRN_HOM_1_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_2_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_3_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_5_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_HOM_5_Loc3_VisStim_D',]
 lgn_HOM_subjects = ['HOM1','HOM2','HOM3','HOM4','HOM5','HOM5']
 lgn_HOM_location = ['Loc2','Loc2','Loc2','Loc2','Loc2','Loc3']
-locs_LGN_WT = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_10_Loc4_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_10_Loc4_VisStim_D2',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_11_Loc4_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_11_Loc5_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_15_Loc3_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_16_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_17_Loc3_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_18_Loc2_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_18_Loc3_VisStim_D',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_19_Loc2_VisStim_D',]
+locs_LGN_WT = [r'C:\Data\PGRN_Old\PGRN_WT_10_Loc4_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_10_Loc4_VisStim_D2',
+        r'C:\Data\PGRN_Old\PGRN_WT_11_Loc4_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_11_Loc5_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_15_Loc3_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_16_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_17_Loc3_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_18_Loc2_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_18_Loc3_VisStim_D',
+        r'C:\Data\PGRN_Old\PGRN_WT_19_Loc2_VisStim_D',]
 lgn_WT_subjects = ['WT10','WT10','WT11','WT11','WT15','WT16','WT17','WT18','WT18','WT19']
 lgn_WT_location = ['Loc4','Loc4','Loc4','Loc5','Loc3','Loc2','Loc3','Loc2','Loc3','Loc2']
 with PdfPages('LGN_multistim.pdf') as pdf:
@@ -108,21 +108,21 @@ with PdfPages('LGN_multistim.pdf') as pdf:
         plt.close()
 
 # S1
-locs_S1_HOM = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc3_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_2_Loc3_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_3_Loc3_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc5_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc5_WhiskStim_C1',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_5_Loc5_WhiskStim_C',]
+locs_S1_HOM = [r'C:\Data\PGRN_Old\PGRN_HOM_1_Loc3_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_2_Loc3_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_3_Loc3_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc5_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc5_WhiskStim_C1',
+        r'C:\Data\PGRN_Old\PGRN_HOM_5_Loc5_WhiskStim_C',]
 S1_HOM_subjects = ['HOM1','HOM2','HOM3','HOM4','HOM4','HOM5']
 S1_HOM_location = ['Loc3','Loc3','Loc3','Loc5','Loc5','Loc5']
-locs_S1_WT = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_10_Loc1_whiskerstim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_11_Loc1_whiskerstim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_15_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_16_Loc3_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_17_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_18_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_19_Loc3_WhiskStim_C',]
+locs_S1_WT = [r'C:\Data\PGRN_Old\PGRN_WT_10_Loc1_whiskerstim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_11_Loc1_whiskerstim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_15_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_16_Loc3_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_17_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_18_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_19_Loc3_WhiskStim_C',]
 S1_WT_subjects = ['WT10','WT11','WT15','WT16','WT17','WT18','WT19']
 S1_WT_location = ['Loc1','Loc1','Loc4','Loc3','Loc4','Loc4','Loc3']
 with PdfPages('S1_multistim.pdf') as pdf:
@@ -157,23 +157,23 @@ with PdfPages('S1_multistim.pdf') as pdf:
         plt.close()
     
 # VPLM
-locs_VPLM_HOM = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_1_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_2_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_3_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_3_Loc6_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc3_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc4_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_4_Loc6_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_HOM_5_Loc6_WhiskStim_C',]
+locs_VPLM_HOM = [r'C:\Data\PGRN_Old\PGRN_HOM_1_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_2_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_3_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_3_Loc6_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc3_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc4_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_4_Loc6_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_HOM_5_Loc6_WhiskStim_C',]
 vplm_HOM_subjects = ['HOM1','HOM2','HOM3','HOM3','HOM4','HOM4','HOM4','HOM5']
 vplm_HOM_location = ['Loc4','Loc4','Loc4','Loc6','Loc3','Loc4','Loc6','Loc6']
-locs_VPLM_WT = [r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_10_Loc2_whiskerstim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_11_Loc2_whiskerstim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_15_Loc5_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_16_Loc5_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_17_Loc5_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_18_Loc5_WhiskStim_C',
-        r'C:\Users\bsriram\Desktop\Data\PGRN\Sessions\PGRN_WT_19_Loc4_WhiskStim_C',]
+locs_VPLM_WT = [r'C:\Data\PGRN_Old\PGRN_WT_10_Loc2_whiskerstim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_11_Loc2_whiskerstim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_15_Loc5_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_16_Loc5_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_17_Loc5_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_18_Loc5_WhiskStim_C',
+        r'C:\Data\PGRN_Old\PGRN_WT_19_Loc4_WhiskStim_C',]
 vplm_WT_subjects = ['WT10','WT11','WT15','WT16','WT17','WT18','WT19']
 vplm_WT_location = ['Loc2','Loc2','Loc5','Loc5','Loc5','Loc5','Loc4']
 with PdfPages('VPLM_multistim.pdf') as pdf:
