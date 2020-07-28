@@ -1,6 +1,10 @@
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+from scipy.optimize import curve_fit
 
-from kwik_utils import get_unclustered_unit_details
+from .kwik_utils import get_unclustered_unit_details
 
 def exponential_func(x, a, b, c):
     return a*np.exp(-b*x)+c
@@ -10,16 +14,16 @@ def get_r_squared(data,fits):
     sst = np.sum(np.power(data-data.mean(),2))
     return 1-sse/sst
 
-def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_zoom=1,interval=[-1,3]):
+def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_zoom=1,interval=[-1,3],stim_time='timestamps.np',getters=None):
     # kwik_file
     kwik_file = [f for f in os.listdir(loc) if f.endswith('.kwik')]
     kwik_file = kwik_file[0]
     unit_details = get_unclustered_unit_details(os.path.join(loc,kwik_file))
     units = []
     # timestamps
-    timestamps = np.fromfile(os.path.join(loc,'timestamps.np'))
+    timestamps = np.fromfile(os.path.join(loc,stim_time))
     # get every other timestamp
-    ratios = 2
+    ratios = 1
     n_stim = 20
     fig, ax = plt.subplots(16,3,figsize=(20,20))
     plt.subplots_adjust(wspace=0.1, hspace=0.1)
@@ -120,7 +124,7 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
                 this_unit['total_z_t_ms'] = np.nan
                 this_unit['total_z_t_quality_ms'] = np.nan
             units.append(this_unit)
-        else: ax[15-i,1].plot(binned_time[:-1],offset+z_zoom*z_score,color=(0.85,0.85,0.85))
+        else: ax[15-i,1].plot(binned_time[:-1],offset+z_zoom*z_score,color=(0.5,0.5,0.5))
         
         # get the ylim for ax[0]
         ylim = ax[i,0].get_ylim()
@@ -137,12 +141,10 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
     if max_summed_z_lim==-np.inf: max_summed_z_lim=10
     try:
         for i in range(0,16):
-            # ax[15-i,1].set_ylim(-2,np.ceil(1.1*max_z_lim))
-            ax[15-i,1].set_ylim(-2,30)
+            ax[15-i,1].set_ylim(-2,10)
             ax[15-i,1].set_yticklabels([])
             ax[15-i,1].set_xticklabels([])
-            # ax[15-i,2].set_ylim(-2,np.ceil(1.1*max_summed_z_lim))
-            ax[15-i,2].set_ylim(-2,40)
+            ax[15-i,2].set_ylim(-2,20)
             ax[15-i,2].set_yticklabels([])
             ax[15-i,2].set_xticklabels([])
     except:
@@ -151,16 +153,12 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
             
     ax[0,1].set_xticks([0,2])
     ax[0,1].set_xticklabels([0,2])    
-    # ax[0,1].set_yticks([0,np.ceil(1.1*max_z_lim)])
-    # ax[0,1].set_yticklabels([0,np.ceil(1.1*max_z_lim)])
-    ax[0,1].set_yticks([0,30])
-    ax[0,1].set_yticklabels([0,30])
+    ax[0,1].set_yticks([0,10])
+    ax[0,1].set_yticklabels([0,10])
     ax[0,2].set_xticks([0,2])
     ax[0,2].set_xticklabels([0,2])    
-    # ax[0,2].set_yticks([0,np.ceil(1.1*max_summed_z_lim)])
-    # ax[0,2].set_yticklabels([0,np.ceil(1.1*max_summed_z_lim)])
-    ax[0,2].set_yticks([0,40])
-    ax[0,2].set_yticklabels([0,40])
+    ax[0,2].set_yticks([0,20])
+    ax[0,2].set_yticklabels([0,20])
         
     if show_plot: plt.show()
     return fig,units

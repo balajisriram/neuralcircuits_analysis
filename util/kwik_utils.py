@@ -1,4 +1,5 @@
 from klusta.kwik.model import KwikModel
+import numpy as np
 
 def get_unit_details(loc):
     

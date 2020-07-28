@@ -7,7 +7,6 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 import matplotlib
-from scipy.optimize import curve_fit
 import matplotlib.colors as mc
 import colorsys
 import scipy.stats as stats

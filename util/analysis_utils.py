@@ -183,8 +183,7 @@ def load_spike_and_trial_details(loc):
     print('Loading spike details')
     spike_and_trial_details['spike_records'] = load_spikerecs_to_dict(loc)
     return spike_and_trial_details
-    
-    
+       
 def load_trialrecs_to_dict(loc):
     file = [f for f in os.listdir(loc) if f.startswith('trialRecords')]
     if len(file) > 1 or len(file)==0:
