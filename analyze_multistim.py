@@ -3,12 +3,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pickle
 import pandas as pd
-from tdt_utils import get_tdt_date, get_tdt_subject, get_tdt_genotype
+from tdt_utils import get_tdt_date, get_tdt_time, get_tdt_subject, get_tdt_genotype, has_ipsi_stim, get_repeat_number
 import os
+import shutil
 
 
-
-def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',title='Unknown',data_df=None):
+def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',title='Unknown',data_df=None, getters=None,chan_list=None):
     if not data_df:
         data_df=pd.DataFrame()
     if not base_path:
@@ -22,25 +22,120 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
         ax.text(0.5,0.5,title,horizontalalignment='center',verticalalignment='center',fontsize=48)
         pdf.savefig(f)
         
-        for session_path in session_paths:
-            f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=2,stim_time='timestamps_R.np')
+        for session_name,session_path in zip(sessions,session_paths):
+            if getters:
+                get_subject,get_date,get_time,get_genotype,get_repeat = getters
+                details={}
+                details['subject_id'] = get_subject(session_name)
+                details['date'] = get_date(session_name)
+                details['time'] = get_time(session_name)
+                details['genotype'] = get_genotype(session_name)
+                details['repeat'] = get_repeat(session_name)
+                if has_ipsi_stim(session_path):
+                    details['has_ipsi'] = True
+                else:
+                    details['has_ipsi'] = False
+            else:
+                details = (None,None,None)
+            if chan_list:
+                chan_that_session = chan_list[details['subject_id']]
+                print(details['subject_id'],':',chan_that_session)
+            else: chan_that_session = range(16)
+            details['stim_location'] = 'contra'
+            
+            # weirdness
+            if 'JustAfter' in output_pdf: details['drug_state'] = 'JustAfter'
+            elif '10min' in output_pdf: details['drug_state'] = '10minin'
+            else: details['drug_state'] = 'None'
+            
+            f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
+            f.suptitle(session_name+' CONTRA stim',fontsize=20)
             curr_units=pd.DataFrame(units)
             data_df=data_df.append(curr_units,ignore_index=True,sort=False)
             pdf.savefig(f)
             plt.close()
-        
+            
+            if has_ipsi_stim(session_path):
+                if getters:
+                    get_subject,get_date,get_time,get_genotype,get_repeat = getters
+                    details={}
+                    details['subject_id'] = get_subject(session_name)
+                    details['date'] = get_date(session_name)
+                    details['time'] = get_time(session_name)
+                    details['genotype'] = get_genotype(session_name)
+                    details['repeat'] = get_repeat(session_name)
+                    details['has_ipsi'] = True
+                else:
+                    details = (None,None,None)
+                
+                details['stim_location'] = 'ipsi'
+                # weirdness
+                if 'JustAfter' in output_pdf: details['drug_state'] = 'JustAfter'
+                elif '10min' in output_pdf: details['drug_state'] = '10minin'
+                else: details['drug_state'] = 'None'
+                
+                f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_L.np',common_details=details)
+                f.suptitle(session_name+' IPSI stim',fontsize=20)
+                curr_units=pd.DataFrame(units)
+                data_df=data_df.append(curr_units,ignore_index=True,sort=False)
+                
+                pdf.savefig(f)
+                plt.close()        
     return data_df
  
 if __name__=='__main__':
-    tdt_tanks = ['PGRN_390_HET-200706-154900','PGRN_389_WT-200706-161140','PGRN_391_HOM-200706-163047','PGRN_384_WT-200706-164212','PGRN_376_WT-200708-124614','PGRN_370_HOM-200708-131420','PGRN_400_HET-200708-133938','PGRN_401_HET-200708-140920','PGRN_383_HOM-200708-143833','PGRN_378_WT-200708-150655','PGRN_377_HET-200708-155016','PGRN_380_WT-200708-161417','PGRN_382_WT-200708-163354','PGRN_372_HET-200708-165326','PGRN_374_HOM-200713-102856','PGRN_375_HOM-200713-105801','PGRN_379_HET-200713-111941','PGRN_388_HOM-200713-123705','PGRN_381_HET-200713-130234','PGRN_371_WT-200713-134124','PGRN_369_WT-200713-140327','PGRN_396_HOM-200713-142749','PGRN_393_HOM-200713-145953','PGRN_390_HET-200715-112446','PGRN_389_WT-200715-114822','PGRN_391_HOM-200715-120933','PGRN_384_WT-200715-123104','PGRN_389_WT-200721-122505','PGRN_390_HET-200721-124605','PGRN_391_HOM-200721-130354','PGRN_384_WT-200721-132153','PGRN_376_WT-200721-134456','PGRN_370_HOM-200721-140639','PGRN_400_HET-200721-142125','PGRN_377_HET-200721-143537','PGRN_378_WT-200721-145141','PGRN_401_HET-200721-150644','PGRN_380_WT-200723-102746','PGRN_382_WT-200723-104510','PGRN_372_HET-200723-110143','PGRN_374_HOM-200723-112530','PGRN_375_HOM-200723-114142','PGRN_379_HET-200723-115754','PGRN_388_HOM-200723-121521','PGRN_383_HOM-200723-123322',]
-    
-    getters=get_tdt_subject,get_tdt_date,get_tdt_genotype
-    
-    base_path=r'C:\Users\bsriram\Desktop\Data\PGRN_Coh2'
-    data_df = analyze_and_make_pdf(base_path=base_path, sessions=tdt_tanks, output_pdf='allAnalyzed.pdf',title='All data',getters=getters)
-    data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\data_all.pickle')
 
+    chan_list = {
+    'PGRN_369': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 13],
+    'PGRN_370': [ 4,  5,  6,  7,  8,  9, 12],
+    'PGRN_371': [ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
+    'PGRN_372': [ 0,  1,  4,  5,  6,  7,  9, 10], 
+    'PGRN_374': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13],
+    'PGRN_375': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 13, 14, 15],
+    'PGRN_376': [ 3,  4,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15], 
+    'PGRN_377': [ 0,  3,  4,  5,  6,  7,  8,  9, 13],
+    'PGRN_378': [ 0,  1,  2,  3,  4,  8, 11, 12, 13, 14],
+    'PGRN_379': [ 0,  1,  2,  3,  5,  6, 11],
+    'PGRN_380': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10],
+    'PGRN_381': [ 0,  1,  2,  3,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
+    'PGRN_382': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10],
+    'PGRN_383': [ 3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15],
+    'PGRN_384': [ 0,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13],
+    'PGRN_388': [ 0,  1,  2,  3,  4,  5,  6,  7, 10, 11, 14],
+    'PGRN_389': [ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11],
+    'PGRN_390': [ 0,  6,  7,  8,  9, 10, 11],
+    'PGRN_391': [ 1,  2,  8,  9, 10, 13, 15],
+    'PGRN_393': [9],
+    'PGRN_396': [ 2,  3,  4,  5,  6,  7,  8,  9, 10, 11],
+    'PGRN_400': [ 0,  1, 12],
+    'PGRN_401': [ 5,  7, 12],}
+    tdt_tanks=tdt_tanks_all
+    getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
+    base_path=r'C:\Users\bsriram\Desktop\Data\PGRN_Coh2'
+    #data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_pre_drug, output_pdf='PGRN_BeforeDrug.pdf',title='All Data',getters=getters)
+    data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug, output_pdf='PGRN_JustAfter.pdf',title='All Data',getters=getters)
+    data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepamJustAfter_data.pickle')
+    data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug2, output_pdf='PGRN_10minin.pdf',title='All Data',getters=getters)
+    data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepam10minin_data.pickle')
+    # dest_path = r'C:\Users\bsriram\Desktop\Data\channels_only'
+    # from klusta.kwik.model import KwikModel
+    # import numpy as np
+    # import csv
+    # for tank in tdt_tanks:
+        # src_file = os.path.join(base_path,tank,'raw.kwik')
+        # kwik_model=KwikModel(src_file)
+        # kwik_model.channel_group = 0
+        # spike_times = kwik_model.spike_times
+        # spike_channels = np.argmax(kwik_model.all_masks,axis=1)
         
+        # des_path = os.path.join(dest_path,tank+'.txt')
+        # with open(des_path,'w') as f:
+            # writer = csv.writer(f)
+            # for time,chan in zip(spike_times,spike_channels):
+                # writer.writerow([time,chan])
+        # print(des_path)
+    
+    
 if False:
     allData = pd.DataFrame()
 
