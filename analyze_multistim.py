@@ -1,81 +1,65 @@
 from util.whisker_analyses import analyze_mua_by_channel_multistim
+from util.CohortDetails import tank_df as tank_details
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pickle
 import pandas as pd
-from tdt_utils import get_tdt_date, get_tdt_time, get_tdt_subject, get_tdt_genotype, has_ipsi_stim, get_repeat_number
+# from tdt_utils import get_tdt_date, get_tdt_time, get_tdt_subject, get_tdt_genotype, has_ipsi_stim, get_repeat_number
 import os
 import shutil
 
 
-def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',title='Unknown',data_df=None, getters=None,chan_list=None):
+def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',title='Unknown',data_df=None, chan_list=None):
     if not data_df:
         data_df=pd.DataFrame()
-    if not base_path:
-        # tanks contain full path
-        session_paths = sessions
-    else:
-        session_paths = [os.path.join(base_path,t) for t in sessions]
-    with PdfPages(output_pdf) as pdf:
+    with PdfPages(os.path.join(base_path,output_pdf)) as pdf:
         # title page
         f,ax=plt.subplots(1,1,figsize=(20,20))
         ax.text(0.5,0.5,title,horizontalalignment='center',verticalalignment='center',fontsize=48)
         pdf.savefig(f)
         
-        for session_name,session_path in zip(sessions,session_paths):
-            if getters:
-                get_subject,get_date,get_time,get_genotype,get_repeat = getters
-                details={}
-                details['subject_id'] = get_subject(session_name)
-                details['date'] = get_date(session_name)
-                details['time'] = get_time(session_name)
-                details['genotype'] = get_genotype(session_name)
-                details['repeat'] = get_repeat(session_name)
-                if has_ipsi_stim(session_path):
-                    details['has_ipsi'] = True
-                else:
-                    details['has_ipsi'] = False
+        for row in sessions.itertuples():
+            # get_subject,get_date,get_time,get_genotype,get_repeat = getters
+            details={}
+            breakpoint()
+            details['subject_id'] = row.subject
+            details['date'] = row.date
+            details['time'] = row.time
+            details['genotype'] = row.genotype
+            details['repeat'] = row.repeat
+            details['drug_state'] = row.drug_details
+            if row.stim_lateralism=='bilateral':
+                details['has_ipsi'] = True
             else:
-                details = (None,None,None)
-            if chan_list:
-                chan_that_session = chan_list[details['subject_id']]
-                print(details['subject_id'],':',chan_that_session)
-            else: chan_that_session = range(16)
+                details['has_ipsi'] = False
+            # if chan_list:
+                # chan_that_session = chan_list[details['subject_id']]
+                # print(details['subject_id'],':',chan_that_session)
+            chan_that_session = range(16)
             details['stim_location'] = 'contra'
-            
-            # weirdness
-            if 'JustAfter' in output_pdf: details['drug_state'] = 'JustAfter'
-            elif '10min' in output_pdf: details['drug_state'] = '10minin'
-            else: details['drug_state'] = 'None'
+            # if base_path: session_path=os.path.join(base_path,row.tank_name)
+            session_path=os.pat.join(row.raw_data_path,row.tank_name)
             
             f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
-            f.suptitle(session_name+' CONTRA stim',fontsize=20)
+            f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)
             curr_units=pd.DataFrame(units)
             data_df=data_df.append(curr_units,ignore_index=True,sort=False)
             pdf.savefig(f)
             plt.close()
             
-            if has_ipsi_stim(session_path):
-                if getters:
-                    get_subject,get_date,get_time,get_genotype,get_repeat = getters
-                    details={}
-                    details['subject_id'] = get_subject(session_name)
-                    details['date'] = get_date(session_name)
-                    details['time'] = get_time(session_name)
-                    details['genotype'] = get_genotype(session_name)
-                    details['repeat'] = get_repeat(session_name)
-                    details['has_ipsi'] = True
-                else:
-                    details = (None,None,None)
-                
+            if row.stim_lateralism=='bilateral':
+                details={}
+                details['subject_id'] = row.subject
+                details['date'] = row.date
+                details['time'] = row.time
+                details['genotype'] = row.genotype
+                details['repeat'] = row.repeat
+                details['drug_state'] = row.drug_details
+                details['has_ipsi'] = True
                 details['stim_location'] = 'ipsi'
-                # weirdness
-                if 'JustAfter' in output_pdf: details['drug_state'] = 'JustAfter'
-                elif '10min' in output_pdf: details['drug_state'] = '10minin'
-                else: details['drug_state'] = 'None'
                 
                 f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_L.np',common_details=details)
-                f.suptitle(session_name+' IPSI stim',fontsize=20)
+                f.suptitle(row.tank_name+' IPSI stim',fontsize=20)
                 curr_units=pd.DataFrame(units)
                 data_df=data_df.append(curr_units,ignore_index=True,sort=False)
                 
@@ -109,14 +93,16 @@ if __name__=='__main__':
     'PGRN_396': [ 2,  3,  4,  5,  6,  7,  8,  9, 10, 11],
     'PGRN_400': [ 0,  1, 12],
     'PGRN_401': [ 5,  7, 12],}
-    tdt_tanks=tdt_tanks_all
-    getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
-    base_path=r'C:\Users\bsriram\Desktop\Data\PGRN_Coh2'
+    # tdt_tanks=tdt_tanks_all
+    # getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
+    base_path=r'C:\Users\bsriram\Documents'
+    which_tanks = tank_details.loc[tank_details.tank_name=='PGRN_390_HET-200721-125503']
+    data_df = analyze_and_make_pdf(base_path = base_path, sessions=which_tanks, output_pdf='trial.pdf',title='trial')
     #data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_pre_drug, output_pdf='PGRN_BeforeDrug.pdf',title='All Data',getters=getters)
-    data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug, output_pdf='PGRN_JustAfter.pdf',title='All Data',getters=getters)
-    data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepamJustAfter_data.pickle')
-    data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug2, output_pdf='PGRN_10minin.pdf',title='All Data',getters=getters)
-    data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepam10minin_data.pickle')
+    # data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug, output_pdf='PGRN_JustAfter.pdf',title='All Data',getters=getters)
+    data_df.to_pickle(r'C:\Users\bsriram\Documents\trial.pickle')
+    # data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug2, output_pdf='PGRN_10minin.pdf',title='All Data',getters=getters)
+    # data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepam10minin_data.pickle')
     # dest_path = r'C:\Users\bsriram\Desktop\Data\channels_only'
     # from klusta.kwik.model import KwikModel
     # import numpy as np
