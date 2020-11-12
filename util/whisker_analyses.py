@@ -167,6 +167,7 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
                 this_unit['genotype'] = common_details['genotype']
                 this_unit['stim_location'] = common_details['stim_location']
                 this_unit['unit_id'] = common_details['subject_id'] + '_' + common_details['genotype'] + '_' + str(i)
+                this_unit['unit_and_tank_id'] = common_details['tank_name'] + '_' + str(i)
                 this_unit['repeat'] = common_details['repeat']
                 if 'drug_state' in common_details: this_unit['drug_state'] = common_details['drug_state']
                 
