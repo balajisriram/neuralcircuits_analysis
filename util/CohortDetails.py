@@ -50,12 +50,12 @@ def get_n_stim(tank,base_path=r'\\camhpcisixcifs.biogen.com\dept\electrophysiolo
         elif np.abs(istimi-10)<1 or np.abs(istimi-5)<1:
             n_stim=1
         else:
-            print('Interstim interval is {0} for tank {1}. Setting n_stim to None'.format(istimi,tank))
-            n_stim=None
+            print('Interstim interval is {0} for tank {1}. Setting n_stim to 0'.format(istimi,tank))
+            n_stim=0
     except Exception as ex:
         print(ex)
         print('tank::',tank)
-        n_stim=None
+        n_stim=0
     return n_stim
     
 def get_stim_lateralism(tank,base_path=r'\\camhpcisixcifs.biogen.com\dept\electrophysiology\invivo_mouse\PGRN\PGRN_AwakeCohort2\DataAnalyzed'):
