@@ -99,7 +99,7 @@ tank_details = []
 
 
 raw_path=r'\\camhpcisixcifs.biogen.com\dept\electrophysiology\invivo_mouse\PGRN\PGRN_AwakeCohort2\DataAnalyzed'
-raw_path_nix = '/camhpc.biogen.com/dept/electrophysiology/invivo_mouse/PGRN/PGRN_AwakeCohort2/DataAnalyzed'
+raw_path_nix = '/camhpc/dept/electrophysiology/invivo_mouse/PGRN/PGRN_AwakeCohort2/DataAnalyzed'
 # for tank in awake_cohort1_tanks:
     # this_tank = {}
     # this_tank['tank_name'] = tank
