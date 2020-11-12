@@ -95,7 +95,7 @@ if __name__=='__main__':
     'PGRN_401': [ 5,  7, 12],}
     # tdt_tanks=tdt_tanks_all
     # getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
-    base_path=r'C:\Users\bsriram\Documents'
+    base_path='~/code/neuralcircuits_analysis/'
     which_tanks = tank_details.loc[tank_details.tank_name=='PGRN_390_HET-200721-125503']
     data_df = analyze_and_make_pdf(base_path = base_path, sessions=which_tanks, output_pdf='trial.pdf',title='trial')
     #data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_pre_drug, output_pdf='PGRN_BeforeDrug.pdf',title='All Data',getters=getters)
