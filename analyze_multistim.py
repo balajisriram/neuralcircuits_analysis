@@ -98,28 +98,8 @@ if __name__=='__main__':
     base_path='/home/bsriram/code/neuralcircuits_analysis'
     which_tanks = tank_details.loc[tank_details.tank_name=='PGRN_390_HET-200721-125503']
     data_df = analyze_and_make_pdf(base_path = base_path, sessions=which_tanks, output_pdf='trial.pdf',title='trial')
-    #data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_pre_drug, output_pdf='PGRN_BeforeDrug.pdf',title='All Data',getters=getters)
-    # data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug, output_pdf='PGRN_JustAfter.pdf',title='All Data',getters=getters)
-    data_df.to_pickle(r'C:\Users\bsriram\Documents\trial.pickle')
-    # data_df = analyze_and_make_pdf(base_path=base_path, sessions=awake_cohort2_post_drug2, output_pdf='PGRN_10minin.pdf',title='All Data',getters=getters)
-    # data_df.to_pickle(r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results\Cohort2\PGRN_diazepam10minin_data.pickle')
-    # dest_path = r'C:\Users\bsriram\Desktop\Data\channels_only'
-    # from klusta.kwik.model import KwikModel
-    # import numpy as np
-    # import csv
-    # for tank in tdt_tanks:
-        # src_file = os.path.join(base_path,tank,'raw.kwik')
-        # kwik_model=KwikModel(src_file)
-        # kwik_model.channel_group = 0
-        # spike_times = kwik_model.spike_times
-        # spike_channels = np.argmax(kwik_model.all_masks,axis=1)
-        
-        # des_path = os.path.join(dest_path,tank+'.txt')
-        # with open(des_path,'w') as f:
-            # writer = csv.writer(f)
-            # for time,chan in zip(spike_times,spike_channels):
-                # writer.writerow([time,chan])
-        # print(des_path)
+    data_df.to_pickle(os.path.join(base_path,'output.pickle'))
+
     
     
 if False:
