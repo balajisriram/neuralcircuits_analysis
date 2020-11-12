@@ -21,8 +21,8 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
         for row in sessions.itertuples():
             # get_subject,get_date,get_time,get_genotype,get_repeat = getters
             details={}
-            breakpoint()
             details['subject_id'] = row.subject
+            details['tank_name'] = row.tank_name
             details['date'] = row.date
             details['time'] = row.time
             details['genotype'] = row.genotype
@@ -50,6 +50,7 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
             if row.stim_lateralism=='bilateral':
                 details={}
                 details['subject_id'] = row.subject
+                details['tank_name'] = row.tank_name
                 details['date'] = row.date
                 details['time'] = row.time
                 details['genotype'] = row.genotype
