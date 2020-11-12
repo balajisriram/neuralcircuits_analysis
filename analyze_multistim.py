@@ -38,7 +38,7 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
             chan_that_session = range(16)
             details['stim_location'] = 'contra'
             # if base_path: session_path=os.path.join(base_path,row.tank_name)
-            session_path=os.pat.join(row.raw_data_path,row.tank_name)
+            session_path=os.path.join(row.raw_data_path,row.tank_name)
             
             f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
             f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)
