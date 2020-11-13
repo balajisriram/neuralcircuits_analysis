@@ -43,11 +43,12 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
             session_path=os.path.join(row.analysis_data_path,row.tank_name)
             
             f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
-            f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)
-            curr_units=pd.DataFrame(units)
-            data_df=data_df.append(curr_units,ignore_index=True,sort=False)
-            pdf.savefig(f)
-            plt.close()
+            if units:
+                f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)
+                curr_units=pd.DataFrame(units)                
+                data_df=data_df.append(curr_units,ignore_index=True,sort=False)
+                pdf.savefig(f)
+                plt.close()
             
             if row.stim_lateralism=='bilateral':
                 details={}
@@ -62,12 +63,12 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
                 details['stim_location'] = 'ipsi'
                 
                 f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_L.np',common_details=details)
-                f.suptitle(row.tank_name+' IPSI stim',fontsize=20)
-                curr_units=pd.DataFrame(units)
-                data_df=data_df.append(curr_units,ignore_index=True,sort=False)
-                
-                pdf.savefig(f)
-                plt.close()        
+                if units:
+                    f.suptitle(row.tank_name+' IPSI stim',fontsize=20)
+                    curr_units=pd.DataFrame(units)
+                    data_df=data_df.append(curr_units,ignore_index=True,sort=False)
+                    pdf.savefig(f)
+                    plt.close()        
     return data_df
  
 if __name__=='__main__':
