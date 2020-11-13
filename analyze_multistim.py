@@ -96,10 +96,13 @@ if __name__=='__main__':
     'PGRN_401': [ 5,  7, 12],}
     # tdt_tanks=tdt_tanks_all
     # getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
+    
     if os.name=='nt':
         base_path=r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results'
     else:
         base_path='/home/bsriram/code/neuralcircuits_analysis'
+    
     which_tanks = tank_details.loc[tank_details.n_stim>0]
     data_df = analyze_and_make_pdf(base_path = base_path, sessions=which_tanks, output_pdf='trial.pdf',title='trial')
-    data_df.to_pickle(os.path.join(base_path,'output.pickle')
+    data_df.to_pickle(os.path.join(base_path,'output.pickle'))
+    
