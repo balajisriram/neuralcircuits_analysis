@@ -5,28 +5,29 @@ import pandas as pd
 import os
 import shutil
 import tdt
+import numpy as np
 
-
-def analyze_raw(base_path=None, sessions = [], output_pdf='output.pdf',title='Unknown',data_df=None, chan_list=None):
+def analyze_raw(sessions):
     if not data_df:
         data_df=pd.DataFrame()
     curr_row = 0
+    all_units = []
     for row in sessions.itertuples():
         print('{0} of {1}::{2}'.format(curr_row,len(sessions),row.tank_name))
         curr_row +=1
         # get_subject,get_date,get_time,get_genotype,get_repeat = getters
         that_session={}
         session_path=os.path.join(row.raw_data_path,row.tank_name)
+        temp = tdt.read_block(session_path)
+        data = temp['streams']['BBLF']['data']
+        data_std = np.std(data,axis=1)
+        for channel in range(16):
+            this_unit = {}
+            this_unit['unit_and_tank_id'] = row.tank_name+'_'+str(channel)
+            this_unit['raw_signal_std'] = data_std[channel]
+            all_units.append(this_unit)
         
-        
-        f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
-        f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)
-        curr_units=pd.DataFrame(units)
-        data_df=data_df.append(curr_units,ignore_index=True,sort=False)
-        pdf.savefig(f)
-        plt.close()
-        
-    return data_df
+    return all_units
  
 def assert_raw_exists(sessions):
     curr_row = 0
@@ -45,7 +46,7 @@ if __name__=='__main__':
         base_path=r'C:\Users\bsriram\Desktop\Code\neuralcircuits_analysis\Results'
     else:
         base_path='/home/bsriram/code/neuralcircuits_analysis'
-    
-    which_tanks = tank_details.loc[tank_details.n_stim>0]
-    assert_raw_exists(which_tanks)
+    units = analyze_raw(tank_details)
+    data_df=pd.DataFrame(units)
+    data_df.to_pickle(os.path.join(base_path,'rawData_std.pickle'))
     
