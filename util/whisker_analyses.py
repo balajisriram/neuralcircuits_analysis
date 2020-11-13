@@ -52,7 +52,7 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
             spike_that_trial = spike_that_trial[np.bitwise_and(spike_that_trial>=interval[0],spike_that_trial<=interval[1])]
             temp = np.histogram(spike_that_trial,binned_time)
             firing_rate[j,:] = temp[0]
-            ax[15-i,0].vlines(spike_that_trial,ymin=j,ymax=j+0.8,color=unit_color)
+            #ax[15-i,0].vlines(spike_that_trial,ymin=j,ymax=j+0.8,color=unit_color)
             
         m = np.mean(firing_rate,axis=0)/bin_interval
         sd = np.std(firing_rate,axis=0)/bin_interval
@@ -65,7 +65,7 @@ def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_
         offset = 0
         ax[15-i,2].plot([binned_time[0],binned_time[-1]],[offset,offset],'k--')
         ax[15-i,3].plot([binned_time[0],binned_time[-1]],[offset,offset],'k--')
-        print('chan for subject',chans)
+        # print('chan for subject',chans)
         if np.max(z_score)>min_z and i in chans:
             this_unit = {}
             ax[15-i,1].plot(binned_time[:-1],m,color=unit_color,linewidth=3,alpha=0.5)

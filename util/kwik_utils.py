@@ -41,7 +41,7 @@ def get_unit_details(loc):
     units = []
     
     for j,ch_grp in enumerate(ch_groups):
-        print('Shank ', j+1,' of ',len(ch_groups))
+        # print('Shank ', j+1,' of ',len(ch_groups))
         
         kwik_model.channel_group = ch_grp # go to that channel group
         kwik_model.clustering = 'main'
@@ -54,7 +54,7 @@ def get_unit_details(loc):
         
         
         for i,clust_num in enumerate(cluster_ids):
-            print('{0} of {1}'.format(i,cluster_ids.size))
+            # print('{0} of {1}'.format(i,cluster_ids.size))
             unit = {}
             unit["shank_no"] = ch_grp
             unit["cluster_id"] = clust_num

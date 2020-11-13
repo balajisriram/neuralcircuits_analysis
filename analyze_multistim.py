@@ -17,8 +17,10 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
         f,ax=plt.subplots(1,1,figsize=(20,20))
         ax.text(0.5,0.5,title,horizontalalignment='center',verticalalignment='center',fontsize=48)
         pdf.savefig(f)
-        
+        curr_row = 0
         for row in sessions.itertuples():
+            print('{0} of {1}::{2}'.format(curr_row,len(sessions),row.tank_name))
+            curr_row +=1
             # get_subject,get_date,get_time,get_genotype,get_repeat = getters
             details={}
             details['subject_id'] = row.subject
@@ -38,7 +40,7 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
             chan_that_session = range(16)
             details['stim_location'] = 'contra'
             # if base_path: session_path=os.path.join(base_path,row.tank_name)
-            session_path=os.path.join(row.raw_data_path,row.tank_name)
+            session_path=os.path.join(row.analysis_data_path,row.tank_name)
             
             f,units = analyze_mua_by_channel_multistim(session_path,show_plot=False,min_z=0,stim_time='timestamps_R.np',common_details=details,chans=chan_that_session)
             f.suptitle(row.tank_name+' CONTRA stim',fontsize=20)

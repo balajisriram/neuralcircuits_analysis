@@ -100,8 +100,10 @@ tank_details = []
 
 if os.name=='nt':
     raw_path=r'\\camhpcisixcifs.biogen.com\dept\electrophysiology\invivo_mouse\PGRN\PGRN_AwakeCohort2\DataAnalyzed'
+    analysis_path = r'C:\Users\bsriram\Desktop\Data\PGRN_Coh2_ephys_analysis'
 else: 
     raw_path = '/camhpc/dept/electrophysiology/invivo_mouse/PGRN/PGRN_AwakeCohort2/DataAnalyzed'
+    analysis_path = raw_path
 # for tank in awake_cohort1_tanks:
     # this_tank = {}
     # this_tank['tank_name'] = tank
@@ -125,6 +127,7 @@ for tank in awake_cohort2_repeat1:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'N/A'
@@ -141,6 +144,7 @@ for tank in awake_cohort2_repeat2:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'N/A'
@@ -157,6 +161,7 @@ for tank in awake_cohort2_repeat2_2:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'N/A'
@@ -173,6 +178,7 @@ for tank in awake_cohort2_repeat3:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'N/A'
@@ -189,6 +195,7 @@ for tank in awake_cohort2_pre_drug:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'None'
@@ -205,6 +212,7 @@ for tank in awake_cohort2_post_drug:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'EarlyDiazepam'
@@ -221,6 +229,7 @@ for tank in awake_cohort2_post_drug2:
     this_tank['cohort'] = 'Cohort2'
     this_tank['repeat'] = get_repeat_number(tank)
     this_tank['raw_data_path'] = raw_path
+    this_tank['analysis_data_path'] = analysis_path
     this_tank['n_stim'] = get_n_stim(tank,base_path=this_tank['raw_data_path'])
     this_tank['stim_lateralism'] = get_stim_lateralism(tank,base_path=this_tank['raw_data_path'])
     this_tank['drug_details'] = 'LateDiazepam'
