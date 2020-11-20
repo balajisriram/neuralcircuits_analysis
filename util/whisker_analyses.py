@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 from scipy.optimize import curve_fit
+from scipy.ndimage import gaussian_filter1d
 
 from .kwik_utils import get_unclustered_unit_details
 
@@ -13,6 +14,29 @@ def get_r_squared(data,fits):
     sse = np.sum(np.power(data-fits,2))
     sst = np.sum(np.power(data-data.mean(),2))
     return 1-sse/sst
+
+def plot_autocorr_by_channel(loc):
+    # kwik_file
+    kwik_file = [f for f in os.listdir(loc) if f.endswith('.kwik')]
+    kwik_file = kwik_file[0]
+    unit_details = get_unclustered_unit_details(os.path.join(loc,kwik_file))
+    units = []
+    fig, ax = plt.subplots(4,4,figsize=(20,20))
+    ax = ax.flatten()
+    for i,unit in enumerate(unit_details['units']):
+        print(i)
+        spike_times = unit['spike_time']
+        t = np.arange(0.0,np.max(spike_times)+0.001,0.001) # 1 ms time steps
+        firing_rate = np.histogram(spike_times,t)[0]
+        kernel_width = 2 # 2ms
+        #smooth_fr = gaussian_filter1d(np.float_(firing_rate),kernel_width)
+        xcorr=np.correlate(firing_rate,firing_rate,mode='full')/firing_rate.size
+        xcorr = xcorr[xcorr.size//2:]
+        ax[i].plot(t[:1000],xcorr[:1000]) # 1 sec
+        ax[i].set_yscale('log')
+    return fig
+
+
 
 def analyze_mua_by_channel_multistim(loc,type='raster',show_plot=True,min_z=5,z_zoom=1,interval=[-1,3],stim_time='timestamps.np',common_details=None,chans=range(16)):
     try:

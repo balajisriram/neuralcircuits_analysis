@@ -1,4 +1,4 @@
-from util.whisker_analyses import analyze_mua_by_channel_multistim
+from util.whisker_analyses import analyze_mua_by_channel_multistim,plot_autocorr_by_channel
 from util.CohortDetails import tank_df as tank_details
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
@@ -70,33 +70,21 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
                     pdf.savefig(f)
                     plt.close()        
     return data_df
- 
-if __name__=='__main__':
 
-    chan_list = {
-    'PGRN_369': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 13],
-    'PGRN_370': [ 4,  5,  6,  7,  8,  9, 12],
-    'PGRN_371': [ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
-    'PGRN_372': [ 0,  1,  4,  5,  6,  7,  9, 10], 
-    'PGRN_374': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13],
-    'PGRN_375': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 13, 14, 15],
-    'PGRN_376': [ 3,  4,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15], 
-    'PGRN_377': [ 0,  3,  4,  5,  6,  7,  8,  9, 13],
-    'PGRN_378': [ 0,  1,  2,  3,  4,  8, 11, 12, 13, 14],
-    'PGRN_379': [ 0,  1,  2,  3,  5,  6, 11],
-    'PGRN_380': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10],
-    'PGRN_381': [ 0,  1,  2,  3,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
-    'PGRN_382': [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10],
-    'PGRN_383': [ 3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15],
-    'PGRN_384': [ 0,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13],
-    'PGRN_388': [ 0,  1,  2,  3,  4,  5,  6,  7, 10, 11, 14],
-    'PGRN_389': [ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11],
-    'PGRN_390': [ 0,  6,  7,  8,  9, 10, 11],
-    'PGRN_391': [ 1,  2,  8,  9, 10, 13, 15],
-    'PGRN_393': [9],
-    'PGRN_396': [ 2,  3,  4,  5,  6,  7,  8,  9, 10, 11],
-    'PGRN_400': [ 0,  1, 12],
-    'PGRN_401': [ 5,  7, 12],}
+def get_autocorrelation_function(sessions,base_path):
+    curr_row = 0
+    with PdfPages(os.path.join(base_path,'Autocorr.pdf')) as pdf:
+        for row in sessions.itertuples():
+            print('{0} of {1}::{2}'.format(curr_row,len(sessions),row.tank_name))
+            curr_row +=1
+            session_path=os.path.join(row.analysis_data_path,row.tank_name)
+            f = plot_autocorr_by_channel(session_path)
+            f.suptitle(row.tank_name,fontsize=20)
+            pdf.savefig(f)
+            plt.close()
+        
+        
+if __name__=='__main__':
     # tdt_tanks=tdt_tanks_all
     # getters=get_tdt_subject,get_tdt_date,get_tdt_time,get_tdt_genotype,get_repeat_number
     
@@ -105,7 +93,6 @@ if __name__=='__main__':
     else:
         base_path='/home/bsriram/code/neuralcircuits_analysis'
     
-    which_tanks = tank_details.loc[tank_details.n_stim>0]
-    data_df = analyze_and_make_pdf(base_path = base_path, sessions=which_tanks, output_pdf='trial.pdf',title='trial')
-    data_df.to_pickle(os.path.join(base_path,'output.pickle'))
+    which_tanks = tank_details.loc[tank_details.n_stim==0]
+    get_autocorrelation_function(which_tanks,base_path)
     
