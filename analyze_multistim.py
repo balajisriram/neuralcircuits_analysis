@@ -73,15 +73,22 @@ def analyze_and_make_pdf(base_path=None, sessions = [], output_pdf='output.pdf',
 
 def get_autocorrelation_function(sessions,base_path):
     curr_row = 0
+    all_units = []
     with PdfPages(os.path.join(base_path,'Autocorr.pdf')) as pdf:
         for row in sessions.itertuples():
             print('{0} of {1}::{2}'.format(curr_row,len(sessions),row.tank_name))
             curr_row +=1
             session_path=os.path.join(row.analysis_data_path,row.tank_name)
-            f = plot_autocorr_by_channel(session_path)
+            f,units = plot_autocorr_by_channel(session_path,row)
             f.suptitle(row.tank_name,fontsize=20)
             pdf.savefig(f)
             plt.close()
+            
+            if not all_units:
+                all_units = units
+            else:
+                all_units.extend(units)
+    return all_units
         
         
 if __name__=='__main__':
@@ -94,5 +101,7 @@ if __name__=='__main__':
         base_path='/home/bsriram/code/neuralcircuits_analysis'
     
     which_tanks = tank_details.loc[tank_details.n_stim==0]
-    get_autocorrelation_function(which_tanks,base_path)
+    units = get_autocorrelation_function(which_tanks,base_path)
+    df = pd.DataFrame(units)
+    df.to_pickle(os.path.join(base_path,'Autocorr_df.pickle'))
     

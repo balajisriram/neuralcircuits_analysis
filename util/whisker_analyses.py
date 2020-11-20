@@ -15,7 +15,7 @@ def get_r_squared(data,fits):
     sst = np.sum(np.power(data-data.mean(),2))
     return 1-sse/sst
 
-def plot_autocorr_by_channel(loc):
+def plot_autocorr_by_channel(loc,tank_det):
     # kwik_file
     kwik_file = [f for f in os.listdir(loc) if f.endswith('.kwik')]
     kwik_file = kwik_file[0]
@@ -23,18 +23,35 @@ def plot_autocorr_by_channel(loc):
     units = []
     fig, ax = plt.subplots(4,4,figsize=(20,20))
     ax = ax.flatten()
+    all_units = []
     for i,unit in enumerate(unit_details['units']):
+        this_unit = {}
         print(i)
         spike_times = unit['spike_time']
         t = np.arange(0.0,np.max(spike_times)+0.001,0.001) # 1 ms time steps
         firing_rate = np.histogram(spike_times,t)[0]
         kernel_width = 1 # 2ms
         smooth_fr = gaussian_filter1d(np.float_(firing_rate),kernel_width)
-        xcorr=np.correlate(smooth_fr,smooth_fr,mode='full')/smooth_fr.size
+        xcorr=np.correlate(firing_rate,firing_rate,mode='full')/firing_rate.size
         xcorr = xcorr[xcorr.size//2:]
         ax[i].plot(t[:1000],xcorr[:1000]) # 1 sec
+        this_unit['mean_activity_nostim'] = spike_times.size/np.max(spike_times)
+        this_unit['xcorr'] = xcorr[:1000]
+        # fit exponential_func
+        try:
+            popt, pcov = curve_fit(exponential_func, t[:1000], xcorr[:1000], p0=(xcorr[0], 0.5, 0),bounds=([xcorr[0]*0.8,1./800,0],[max_z[0]*1.2,np.inf,np.inf]))
+            this_unit['xcorr_t'] = 1/popt[1]
+            this_unit['xcorr_fit_quality'] = get_r_squared(xcorr[:1000],exponential_func(t[:1000], *popt))
+            ax[i].plot(t[:1000],exponential_func(t[:1000], *popt),'k')
+        except Exception as ex:
+            print(ex)
+            this_unit['xcorr_t'] = np.nan
+            this_unit['xcorr_fit_quality'] = np.nan
+        this_unit['unit_id'] = tank_det.subject_id + '_' + tank_det.genotype + '_' + str(i)
+        this_unit['unit_and_tank_id'] = tank_det.tank_name + '_' + str(i)
         ax[i].set_yscale('log')
-    return fig
+        all_units.append(this_unit)
+    return fig,all_units
 
 
 
