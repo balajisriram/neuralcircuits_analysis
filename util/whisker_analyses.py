@@ -28,9 +28,9 @@ def plot_autocorr_by_channel(loc):
         spike_times = unit['spike_time']
         t = np.arange(0.0,np.max(spike_times)+0.001,0.001) # 1 ms time steps
         firing_rate = np.histogram(spike_times,t)[0]
-        kernel_width = 2 # 2ms
-        #smooth_fr = gaussian_filter1d(np.float_(firing_rate),kernel_width)
-        xcorr=np.correlate(firing_rate,firing_rate,mode='full')/firing_rate.size
+        kernel_width = 1 # 2ms
+        smooth_fr = gaussian_filter1d(np.float_(firing_rate),kernel_width)
+        xcorr=np.correlate(smooth_fr,smooth_fr,mode='full')/smooth_fr.size
         xcorr = xcorr[xcorr.size//2:]
         ax[i].plot(t[:1000],xcorr[:1000]) # 1 sec
         ax[i].set_yscale('log')
