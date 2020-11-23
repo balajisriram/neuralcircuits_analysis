@@ -10,6 +10,9 @@ from .kwik_utils import get_unclustered_unit_details
 def exponential_func(x, a, b, c):
     return a*np.exp(-b*x)+c
 
+def exponential_func1(x,a,b):
+    return a*np.exp(-b*x)
+
 def get_r_squared(data,fits):
     sse = np.sum(np.power(data-fits,2))
     sst = np.sum(np.power(data-data.mean(),2))
@@ -32,22 +35,22 @@ def plot_autocorr_by_channel(loc,tank_det):
         firing_rate = np.histogram(spike_times,t)[0]
         kernel_width = 1 # 2ms
         smooth_fr = gaussian_filter1d(np.float_(firing_rate),kernel_width)
-        xcorr=np.correlate(firing_rate,firing_rate,mode='full')/firing_rate.size
+        xcorr=np.correlate(smooth_fr,smooth_fr,mode='full')/smooth_fr.size
         xcorr = xcorr[xcorr.size//2:]
-        ax[i].plot(t[:1000],xcorr[:1000]) # 1 sec
+        ax[i].plot(t[3:1000],xcorr[3:1000]) # 1 sec
         this_unit['mean_activity_nostim'] = spike_times.size/np.max(spike_times)
         this_unit['xcorr'] = xcorr[:1000]
         # fit exponential_func
         try:
-            popt, pcov = curve_fit(exponential_func, t[:1000], xcorr[:1000], p0=(xcorr[0], 0.5, 0),bounds=([xcorr[0]*0.8,1./800,0],[max_z[0]*1.2,np.inf,np.inf]))
+            popt, pcov = curve_fit(exponential_func1, t[3:200], xcorr[3:200], p0=(xcorr[0], 0.1))
             this_unit['xcorr_t'] = 1/popt[1]
-            this_unit['xcorr_fit_quality'] = get_r_squared(xcorr[:1000],exponential_func(t[:1000], *popt))
-            ax[i].plot(t[:1000],exponential_func(t[:1000], *popt),'k')
+            this_unit['xcorr_fit_quality'] = get_r_squared(xcorr[3:200],exponential_func1(t[3:200], *popt))
+            ax[i].plot(t[3:1000],exponential_func1(t[3:1000], *popt),'k')
         except Exception as ex:
             print(ex)
             this_unit['xcorr_t'] = np.nan
             this_unit['xcorr_fit_quality'] = np.nan
-        this_unit['unit_id'] = tank_det.subject_id + '_' + tank_det.genotype + '_' + str(i)
+        this_unit['unit_id'] = tank_det.subject + '_' + tank_det.genotype + '_' + str(i)
         this_unit['unit_and_tank_id'] = tank_det.tank_name + '_' + str(i)
         ax[i].set_yscale('log')
         all_units.append(this_unit)

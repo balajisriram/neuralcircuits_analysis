@@ -8,8 +8,6 @@ import tdt
 import numpy as np
 
 def analyze_raw(sessions):
-    if not data_df:
-        data_df=pd.DataFrame()
     curr_row = 0
     all_units = []
     for row in sessions.itertuples():
